@@ -5,5 +5,5 @@ public enum ERole {
     ROLE_AGENT,
     ROLE_CLAIMS_OFFICER,
     ROLE_PROVIDER,
-    ROLE_POLICY_HOLDER
+    ROLE_USER
 }
