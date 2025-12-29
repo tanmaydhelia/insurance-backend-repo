@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.identity_service.dto.AuthRequest;
 import com.identity_service.dto.ChangePasswordRequest;
 import com.identity_service.model.UserCredential;
-import com.identity_service.service.AuthService;
 import com.identity_service.service.impl.AuthServiceImpl;
 
 @RestController
