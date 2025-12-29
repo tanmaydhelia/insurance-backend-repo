@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService{
     private String googleClientId = "575184160466-1roir0tpclglg6jgee329l32q7svu500.apps.googleusercontent.com";
     
     public String loginWithGoogle(String idTokenString) {
-    	log.info("Starting Google Token Validation...");
+    	log.info("Starting Google Token Validation... ");
         log.info("Using Client ID: {}", googleClientId);
         log.info("Received Token (prefix): {}...", idTokenString.substring(0, Math.min(idTokenString.length(), 20)));
     	
