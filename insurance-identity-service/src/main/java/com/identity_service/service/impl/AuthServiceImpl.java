@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService{
                     return userCredRepo.save(newUser);
                 });
                 
-                return jwtService.generateToken(user.getName(), user.getRole().toString(), user.getEmail());
+                return jwtService.generateToken(user.getName(), user.getRole().toString(), user.getEmail(), user.getId());
 			} else {
 				log.error("GoogleIdTokenVerifier.verify() returned NULL. Check if Client ID matches 'aud' in token.");
                 throw new RuntimeException("Invalid Google Token");
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService{
     	UserCredential user = userCredRepo.findByName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     	
-    	return jwtService.generateToken(username, user.getRole().toString(), user.getEmail());
+    	return jwtService.generateToken(username, user.getRole().toString(), user.getEmail(), user.getId());
     }
     
     public void validateToken(String token) {

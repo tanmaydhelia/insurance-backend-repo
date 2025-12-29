@@ -21,10 +21,15 @@ public class JwtService {
 
     private long jwtExpiration = 86400000;
     
-    public String generateToken(String username, String roles, String email) {
+    public String generateToken(String username, String roles, String email, Integer id) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", email);
         claims.put("roles", roles);
+        claims.put("userId", id);
+        
+        if(roles.contains("ROLE_AGENT")) {
+            claims.put("agentId", id);
+        }
         return createToken(claims, username);
     }
     
