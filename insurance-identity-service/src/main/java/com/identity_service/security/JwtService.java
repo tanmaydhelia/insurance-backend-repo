@@ -17,7 +17,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
     
-	private String secretKey = "tanmaydheliatanmaydheliatanmaydheliatanmaydheliatanmaydheliatanmaydheliatanmaydhelia";
+	private final String secretKey = "tanmaydheliatanmaydheliatanmaydheliatanmaydheliatanmaydheliatanmaydheliatanmaydhelia";
 
     private long jwtExpiration = 86400000;
     
