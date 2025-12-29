@@ -9,6 +9,6 @@ import com.insurance_claims.model.ClaimStatus;
 
 public interface ClaimRepository extends JpaRepository<Claim,Integer> {
 	List<Claim> findByStatusIn(List<ClaimStatus> statuses);
-    List<Claim> findByPolicyIdIn(List<Long> policyIds);
-    List<Claim> findByHospitalId(Long hospitalId);
+    List<Claim> findByPolicyIdIn(List<Integer> policyIds);
+    List<Claim> findByHospitalId(Integer hospitalId);
 }

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.insurance_claims.dto.PolicyDTO;
 
-@FeignClient(name = "insurance-policy-service")
+@FeignClient(name = "INSURANCE-POLICY-SERVICE")
 public interface PolicyClient {
 
     @GetMapping("/api/policies/{id}")
