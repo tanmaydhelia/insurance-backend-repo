@@ -27,7 +27,6 @@ public class UserCredential {
     private String name;
     private String email;
     private String password;
-    private String googleSubject;
     
     @Enumerated(EnumType.STRING)
     private ERole role;
