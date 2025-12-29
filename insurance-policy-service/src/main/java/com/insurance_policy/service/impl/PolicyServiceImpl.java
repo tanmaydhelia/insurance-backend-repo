@@ -62,6 +62,17 @@ public class PolicyServiceImpl implements PolicyService{
         Policy savedPolicy = policyRepository.save(policy);
         return mapToPolicyResponse(savedPolicy);
     }
+    
+    @Override
+    public Boolean isPolicyActive(Integer policyId) {
+        return policyRepository.findById(policyId)
+                .map(policy -> 
+                    policy.getStatus() == PolicyStatus.ACTIVE && 
+                    !LocalDate.now().isBefore(policy.getStartDate()) &&
+                    !LocalDate.now().isAfter(policy.getEndDate())
+                )
+                .orElse(false);
+    }
 
     @Override
     public List<PolicyResponse> getPoliciesByMember(Integer userId) {

@@ -13,4 +13,5 @@ public interface PolicyService {
     PolicyResponse enrollPolicy(PolicyEnrollmentRequest request);
     List<PolicyResponse> getPoliciesByMember(Integer userId);
     List<PolicyResponse> getPoliciesByAgent(Integer agentId);
+    Boolean isPolicyActive(Integer policyId);
 }
