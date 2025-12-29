@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.insurance-app</groupId>
-	<artifactId>insurace-billing-service</artifactId>
+	<artifactId>insurance-billing-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>insurace-billing-service</name>
 	<description>Demo project for Spring Boot</description>
