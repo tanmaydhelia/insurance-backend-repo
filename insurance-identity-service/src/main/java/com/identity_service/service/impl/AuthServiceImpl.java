@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService{
     private String googleClientId = "575184160466-1roir0tpclglg6jgee329l32q7svu500.apps.googleusercontent.com";
     
     public String loginWithGoogle(String idTokenString) {
-    	log.info("Starting Google Token Validation...");
+    	log.info("Starting Google Token Validation... ");
         log.info("Using Client ID: {}", googleClientId);
         log.info("Received Token (prefix): {}...", idTokenString.substring(0, Math.min(idTokenString.length(), 20)));
     	
@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService{
                     return userCredRepo.save(newUser);
                 });
                 
-                return jwtService.generateToken(user.getName(), user.getRole().toString(), user.getEmail());
+                return jwtService.generateToken(user.getName(), user.getRole().toString(), user.getEmail(), user.getId());
 			} else {
 				log.error("GoogleIdTokenVerifier.verify() returned NULL. Check if Client ID matches 'aud' in token.");
                 throw new RuntimeException("Invalid Google Token");
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService{
     	UserCredential user = userCredRepo.findByName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     	
-    	return jwtService.generateToken(username, user.getRole().toString(), user.getEmail());
+    	return jwtService.generateToken(username, user.getRole().toString(), user.getEmail(), user.getId());
     }
     
     public void validateToken(String token) {
