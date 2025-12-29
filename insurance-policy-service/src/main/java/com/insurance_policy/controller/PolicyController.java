@@ -50,4 +50,9 @@ public class PolicyController {
     public ResponseEntity<List<PolicyResponse>> getAgentPolicies(@PathVariable Integer agentId) {
         return ResponseEntity.ok(policyService.getPoliciesByAgent(agentId));
     }
+    
+    @GetMapping("/policies/{id}")
+    public ResponseEntity<PolicyResponse> getPolicyById(@PathVariable Integer id) {
+        return ResponseEntity.ok(policyService.getPolicyById(id));
+    }
 }
