@@ -87,6 +87,13 @@ public class PolicyServiceImpl implements PolicyService{
                 .map(this::mapToPolicyResponse)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public PolicyResponse getPolicyById(Integer id) {
+        Policy policy = policyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Policy not found with id: " + id));
+        return mapToPolicyResponse(policy);
+    }
 
     private PlanResponse mapToPlanResponse(InsurancePlan plan) {
         PlanResponse response = new PlanResponse();
