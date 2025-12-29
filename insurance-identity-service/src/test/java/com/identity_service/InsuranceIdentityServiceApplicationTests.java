@@ -1,10 +1,10 @@
-package com.billing_service;
+package com.identity_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class InsuraceBillingServiceApplicationTests {
+class InsuranceIdentityServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
