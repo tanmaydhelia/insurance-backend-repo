@@ -20,7 +20,7 @@ import com.insurance_claims.service.ClaimService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/claims")
+@RequestMapping("/claims")
 @RequiredArgsConstructor
 public class ClaimController {
 	private final ClaimService claimService;

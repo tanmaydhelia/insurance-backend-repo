@@ -18,7 +18,7 @@ import com.insurance_policy.dto.PolicyResponse;
 import com.insurance_policy.service.PolicyService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/policy")
 public class PolicyController {
 	private final PolicyService policyService;
 

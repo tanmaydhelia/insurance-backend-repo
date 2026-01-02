@@ -19,7 +19,7 @@ import com.insurance_hospital.service.HospitalService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/hospitals")
+@RequestMapping("/hospitals")
 @RequiredArgsConstructor
 public class HospitalController {
 	private final HospitalService hospitalService;

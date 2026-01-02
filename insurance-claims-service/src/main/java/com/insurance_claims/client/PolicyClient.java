@@ -11,9 +11,9 @@ import com.insurance_claims.dto.PolicyDTO;
 @FeignClient(name = "INSURANCE-POLICY-SERVICE")
 public interface PolicyClient {
 
-    @GetMapping("/api/policies/{id}")
+    @GetMapping("/policy/policies/{id}")
     PolicyDTO getPolicyById(@PathVariable Integer id);
 
-    @GetMapping("/api/policies/member/{userId}")
+    @GetMapping("/policy/policies/member/{userId}")
     List<PolicyDTO> getPoliciesByMember(@PathVariable Integer userId);
 }
