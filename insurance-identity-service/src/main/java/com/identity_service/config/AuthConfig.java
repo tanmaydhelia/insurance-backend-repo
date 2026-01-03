@@ -28,7 +28,9 @@ public class AuthConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
        http.csrf(AbstractHttpConfigurer::disable)
-           .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/token", "/auth/validate", "/auth/change-password", "/auth/google").permitAll()
+           .cors(AbstractHttpConfigurer::disable)
+           .authorizeHttpRequests(auth -> auth
+                   .requestMatchers("/auth/register", "/auth/token", "/auth/validate", "/auth/change-password", "/auth/google", "/auth/users/**").permitAll()
         		   .anyRequest().authenticated());
        
        return http.build();

@@ -13,6 +13,7 @@ public class RouteValidator {
             "/auth/token",
             "/auth/google",
             "/auth/validate",
+            "/auth/users",
             "/eureka"
     );
 	
