@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,5 +60,10 @@ public class AuthController {
 	@PutMapping("/change-password")
 	public String changePassword(@RequestBody ChangePasswordRequest request) {
 	    return authService.changePassword(request);
+	}
+	
+	@GetMapping("/users/{email}")
+	public UserCredential getUserByEmail(@PathVariable String email) {
+		return authService.getUserByEmail(email);
 	}
 }

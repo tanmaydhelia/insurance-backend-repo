@@ -109,4 +109,9 @@ public class AuthServiceImpl implements AuthService{
 
         return "Password changed successfully";
     }
+    
+    public UserCredential getUserByEmail(String email) {
+        return userCredRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
 }
