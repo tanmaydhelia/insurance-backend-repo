@@ -92,7 +92,7 @@ This system follows a microservices architecture pattern with the following comp
 | POST | `/auth/google` | Google OAuth login | No |
 | GET | `/auth/validate` | Validate JWT token | No |
 | PUT | `/auth/change-password` | Change user password | Yes |
-| GET | `/auth/users/{email}` | Get user by email | Yes |
+| GET | `/auth/users/{email}` | Get user by email | No |
 
 #### Request/Response Models:
 
@@ -359,9 +359,9 @@ Response:
 ## 🛠️ Technology Stack
 
 ### Backend Framework
-- **Spring Boot** 3.5.10-SNAPSHOT
+- **Spring Boot** 3.4.0 (API Gateway) / 3.5.10-SNAPSHOT (Other Services)
 - **Java** 17
-- **Spring Cloud** 2025.0.1
+- **Spring Cloud** 2024.0.0 (API Gateway) / 2025.0.1 (Other Services)
 
 ### Microservices Components
 - **Spring Cloud Netflix Eureka** - Service Discovery
@@ -509,6 +509,7 @@ curl http://localhost:9000/auth/validate?token=test
 - All `/policy/**` endpoints
 - All `/claims/**` endpoints
 - All `/hospitals/**` endpoints
+- PUT `/auth/change-password`
 
 ---
 
