@@ -66,4 +66,9 @@ public class AuthController {
 	public UserCredential getUserByEmail(@PathVariable String email) {
 		return authService.getUserByEmail(email);
 	}
+	
+	@GetMapping("/user/{id}")
+    public UserCredential getUserById(@PathVariable Integer id) {
+        return authService.getUserById(id);
+    }
 }

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.identity_service.dto.ChangePasswordRequest;
+import com.identity_service.dto.NotificationEvent;
 import com.identity_service.model.ERole;
 import com.identity_service.model.UserCredential;
 import com.identity_service.repository.UserCredentialRepository;
@@ -29,6 +31,8 @@ public class AuthServiceImpl implements AuthService{
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
     
     private String googleClientId = "575184160466-1roir0tpclglg6jgee329l32q7svu500.apps.googleusercontent.com";
     
@@ -81,7 +85,15 @@ public class AuthServiceImpl implements AuthService{
         }
     	
     	userCredRepo.save(creds);
-    	return "User Added to the system";
+    	
+    	NotificationEvent event = new NotificationEvent(
+                creds.getId(),
+                "Welcome to Smart Health Insurance",
+                "Dear " + creds.getName() + ", your account has been successfully created."
+            );
+       	kafkaTemplate.send("notification_topic", event);
+    	
+    	return "User Added to the system with ID: " + creds.getId();
     }
     
     public String generateToken(String username) {
@@ -114,4 +126,9 @@ public class AuthServiceImpl implements AuthService{
         return userCredRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
+
+	public UserCredential getUserById(Integer id) {
+		return userCredRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+	}
 }

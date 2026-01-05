@@ -6,4 +6,5 @@ import lombok.Data;
 public class PolicyDTO {
 	private Integer id;
     private String status;
+    private Integer userId;
 }

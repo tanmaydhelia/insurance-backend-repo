@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import com.insurance_policy.InsurancePolicyServiceApplication;
+import com.insurance_policy.dto.NotificationEvent;
 import com.insurance_policy.dto.PlanRequest;
 import com.insurance_policy.dto.PlanResponse;
 import com.insurance_policy.dto.PolicyEnrollmentRequest;
@@ -21,6 +24,8 @@ import com.insurance_policy.service.PolicyService;
 @Service
 public class PolicyServiceImpl implements PolicyService{
 
+	@Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
 	
 	private final InsurancePlanRepository planRepository;
     private final PolicyRepository policyRepository;
@@ -60,6 +65,17 @@ public class PolicyServiceImpl implements PolicyService{
         policy.setPremium(plan.getBasePremium());
 
         Policy savedPolicy = policyRepository.save(policy);
+        
+        Integer userId = request.getUserId();
+        
+        NotificationEvent event = new NotificationEvent(
+            userId,
+            "Policy Enrollment Confirmed",
+            "You have successfully enrolled in Plan #" + request.getPlanId() + 
+            ". Your Policy Number is " + savedPolicy.getPolicyNumber()
+        );
+        kafkaTemplate.send("notification_topic", event);
+        
         return mapToPolicyResponse(savedPolicy);
     }
     

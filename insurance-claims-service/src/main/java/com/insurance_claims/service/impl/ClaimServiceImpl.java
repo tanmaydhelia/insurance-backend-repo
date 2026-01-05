@@ -5,12 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.insurance_claims.client.PolicyClient;
 import com.insurance_claims.dto.ClaimRequest;
 import com.insurance_claims.dto.ClaimResponse;
 import com.insurance_claims.dto.ClaimStatusDTO;
+import com.insurance_claims.dto.NotificationEvent;
 import com.insurance_claims.dto.PolicyDTO;
 import com.insurance_claims.model.Claim;
 import com.insurance_claims.model.ClaimStatus;
@@ -23,6 +26,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ClaimServiceImpl implements ClaimService{
+	
+	@Autowired
+	private final KafkaTemplate<String, Object> kafkaTemplate;
 	
 	private final ClaimRepository claimRepository;
     private final PolicyClient policyClient;
@@ -54,6 +60,16 @@ public class ClaimServiceImpl implements ClaimService{
                 .build();
 
         Claim savedClaim = claimRepository.save(claim);
+        
+        Integer userId = policyClient.getPolicyById(request.getPolicyId()).getUserId();
+
+        NotificationEvent event = new NotificationEvent(
+            userId,
+            "Claim Submitted Successfully",
+            "Your claim for " + request.getDiagnosis() + " has been received. Claim ID: " + savedClaim.getId()
+        );
+        kafkaTemplate.send("notification_topic", event);
+        
         return mapToResponse(savedClaim);
     }
 
@@ -105,8 +121,27 @@ public class ClaimServiceImpl implements ClaimService{
         } else {
             throw new RuntimeException("Invalid status update. Allowed: IN_REVIEW, APPROVED, REJECTED");
         }
+        
+        Claim savedClaim = claimRepository.save(claim);
+        
+        
+        String subject = "Claim Status Update: " + savedClaim.getStatus();
+        String body = "Your claim #" + id + " has been " + savedClaim.getStatus();
+        
+        if(savedClaim.getStatus() == ClaimStatus.REJECTED) {
+            body += ". Reason: " + savedClaim.getRejectionReason();
+        }
+        
+        Integer userId = policyClient.getPolicyById(claim.getPolicyId()).getUserId();
 
-        return mapToResponse(claimRepository.save(claim));
+        NotificationEvent event = new NotificationEvent(
+        	userId,
+            subject,
+            body
+        );
+        kafkaTemplate.send("notification_topic", event);
+        
+        return mapToResponse(savedClaim);
     }
 
     private ClaimResponse mapToResponse(Claim claim) {

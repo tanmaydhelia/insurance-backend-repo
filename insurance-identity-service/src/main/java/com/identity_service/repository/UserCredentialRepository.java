@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.identity_service.model.UserCredential;
 
 public interface UserCredentialRepository extends JpaRepository<UserCredential, Integer> {
+	Optional<UserCredential> findById(Integer id);	
 	Optional<UserCredential> findByName(String name);
     Optional<UserCredential> findByEmail(String email);
     Boolean existsByEmail(String email);
