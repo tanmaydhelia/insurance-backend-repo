@@ -38,4 +38,5 @@ public class Claim {
 
     private String rejectionReason;
     private LocalDate date;
+    private String documentUrl;
 }

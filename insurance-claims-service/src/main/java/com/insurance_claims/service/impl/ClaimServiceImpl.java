@@ -49,6 +49,7 @@ public class ClaimServiceImpl implements ClaimService{
                 .claimAmount(request.getClaimAmount())
                 .status(ClaimStatus.SUBMITTED)
                 .submissionSource(request.getSubmissionSource())
+                .documentUrl(request.getDocumentUrl())
                 .date(LocalDate.now())
                 .build();
 
@@ -118,6 +119,7 @@ public class ClaimServiceImpl implements ClaimService{
                 .status(claim.getStatus())
                 .submissionSource(claim.getSubmissionSource())
                 .rejectionReason(claim.getRejectionReason())
+                .documentUrl(claim.getDocumentUrl())
                 .date(claim.getDate())
                 .build();
     }

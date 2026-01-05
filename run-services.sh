@@ -11,5 +11,6 @@ gnome-terminal --tab --title="IDENTITY" -- bash -c "cd $BASE_DIR/insurance-ident
 gnome-terminal --tab --title="POLICY" -- bash -c "cd $BASE_DIR/insurance-policy-service && mvn spring-boot:run; exec bash"
 gnome-terminal --tab --title="CLAIMS" -- bash -c "cd $BASE_DIR/insurance-claims-service && mvn spring-boot:run; exec bash"
 gnome-terminal --tab --title="GATEWAY" -- bash -c "cd $BASE_DIR/insurance-api-gateway && mvn spring-boot:run; exec bash"
+gnome-terminal --tab --title="HOSPITAL" -- bash -c "cd $BASE_DIR/insurance-hospital-service && mvn spring-boot:run; exec bash"
 
 echo "All tabs initialized."

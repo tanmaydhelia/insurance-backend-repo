@@ -1,6 +1,8 @@
 package com.insurance_claims.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +13,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.insurance_claims.dto.ClaimRequest;
 import com.insurance_claims.dto.ClaimResponse;
 import com.insurance_claims.dto.ClaimStatusDTO;
 import com.insurance_claims.service.ClaimService;
+import com.insurance_claims.service.FileUploadService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClaimController {
 	private final ClaimService claimService;
+	private final FileUploadService fileUploadService;
 
     @PostMapping("/submit")
     public ResponseEntity<ClaimResponse> submitClaim(@RequestBody ClaimRequest request) {
@@ -53,5 +58,13 @@ public class ClaimController {
     @PutMapping("/{id}/status")
     public ResponseEntity<ClaimResponse> updateStatus(@PathVariable Integer id, @RequestBody ClaimStatusDTO statusDTO) {
         return ResponseEntity.ok(claimService.updateClaimStatus(id, statusDTO));
+    }
+    
+    @PostMapping("/upload")
+    public ResponseEntity<Map<String, String>> uploadFile(MultipartFile file) {
+        String url = fileUploadService.uploadFile(file);
+        Map<String, String> response = new HashMap<>();
+        response.put("url", url);
+        return ResponseEntity.ok(response);
     }
 }
