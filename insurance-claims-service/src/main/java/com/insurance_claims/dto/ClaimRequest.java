@@ -11,4 +11,5 @@ public class ClaimRequest {
     private Double claimAmount;
     private Integer hospitalId;
     private SubmissionSource submissionSource;
+    private String documentUrl;
 }

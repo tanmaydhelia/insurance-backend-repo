@@ -20,4 +20,5 @@ public class ClaimResponse {
     private SubmissionSource submissionSource;
     private String rejectionReason;
     private LocalDate date;
+    private String documentUrl;
 }
