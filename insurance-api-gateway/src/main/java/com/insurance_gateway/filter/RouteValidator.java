@@ -14,6 +14,7 @@ public class RouteValidator {
             "/auth/google",
             "/auth/validate",
             "/auth/users",
+            "/auth/user",
             "/eureka"
     );
 	

@@ -57,11 +57,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         }
                     }
                     
-//                    request.mutate()
-//                    .header("X-Auth-User", username)
-//                    .header("X-Auth-Roles", role)
-//                    .build();
-                    
+//          
                 } catch (Exception e) {
                     throw new RuntimeException("Unauthorized Access");
                 }

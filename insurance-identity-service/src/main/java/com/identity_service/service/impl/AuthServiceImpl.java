@@ -96,12 +96,12 @@ public class AuthServiceImpl implements AuthService{
     	return "User Added to the system with ID: " + creds.getId();
     }
     
-    public String generateToken(String username) {
+    public String generateToken(String email) {
     	
-    	UserCredential user = userCredRepo.findByName(username)
+    	UserCredential user = userCredRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     	
-    	return jwtService.generateToken(username, user.getRole().toString(), user.getEmail(), user.getId());
+    	return jwtService.generateToken(user.getName(), user.getRole().toString(), email, user.getId());
     }
     
     public void validateToken(String token) {
@@ -109,7 +109,7 @@ public class AuthServiceImpl implements AuthService{
     }
     
     public String changePassword(ChangePasswordRequest request) {
-        UserCredential user = userCredRepo.findByName(request.getUsername())
+        UserCredential user = userCredRepo.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {

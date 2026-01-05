@@ -35,10 +35,10 @@ public class AuthController {
 	
 	@PostMapping("/token")
 	public String getToken(@RequestBody AuthRequest authRequest) {
-		Authentication authenticate  = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+		Authentication authenticate  = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
 		
 		if(authenticate.isAuthenticated()) {
-			return authService.generateToken(authRequest.getUsername());
+			return authService.generateToken(authRequest.getEmail());
 		}
 		else {
 			throw new RuntimeException("Invalid Access!!!!!!");
