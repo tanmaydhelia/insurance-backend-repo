@@ -11,4 +11,6 @@ public interface ClaimRepository extends JpaRepository<Claim,Integer> {
 	List<Claim> findByStatusIn(List<ClaimStatus> statuses);
     List<Claim> findByPolicyIdIn(List<Integer> policyIds);
     List<Claim> findByHospitalId(Integer hospitalId);
+    List<Claim> findByProcessedByIdAndStatus(Integer processedById, ClaimStatus status);
+    List<Claim> findByProcessedByIdAndStatusIn(Integer processedById, List<ClaimStatus> statuses);
 }

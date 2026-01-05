@@ -1,6 +1,7 @@
 package com.insurance_claims.service.impl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import com.insurance_claims.model.ClaimStatus;
 import com.insurance_claims.model.SubmissionSource;
 import com.insurance_claims.repository.ClaimRepository;
 import com.insurance_claims.service.ClaimService;
+import com.insurance_claims.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +34,7 @@ public class ClaimServiceImpl implements ClaimService{
 	
 	private final ClaimRepository claimRepository;
     private final PolicyClient policyClient;
+    private final JwtUtil jwtUtil;
 
     public ClaimResponse submitClaim(ClaimRequest request) {
         if (request.getSubmissionSource() == SubmissionSource.PROVIDER && request.getHospitalId() == null) {
@@ -101,22 +104,60 @@ public class ClaimServiceImpl implements ClaimService{
     }
 
     public List<ClaimResponse> getOpenClaims() {
-        return claimRepository.findByStatusIn(Arrays.asList(ClaimStatus.SUBMITTED, ClaimStatus.IN_REVIEW))
+        // Return ONLY claims with status = SUBMITTED
+        // These are unassigned claims waiting for an officer to pick them up
+        return claimRepository.findByStatusIn(Arrays.asList(ClaimStatus.SUBMITTED))
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    public ClaimResponse updateClaimStatus(Integer id, ClaimStatusDTO statusDTO) {
+    public ClaimResponse updateClaimStatus(Integer id, ClaimStatusDTO statusDTO, String token) {
         Claim claim = claimRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Claim not found"));
 
-        if (statusDTO.getStatus() == ClaimStatus.IN_REVIEW || statusDTO.getStatus() == ClaimStatus.APPROVED || statusDTO.getStatus() == ClaimStatus.REJECTED) {
+        // Validate allowed status transitions
+        if (statusDTO.getStatus() == ClaimStatus.IN_REVIEW || 
+            statusDTO.getStatus() == ClaimStatus.APPROVED || 
+            statusDTO.getStatus() == ClaimStatus.REJECTED) {
+            
+            // Validate that only SUBMITTED claims can be picked up for review
+            if (statusDTO.getStatus() == ClaimStatus.IN_REVIEW) {
+                if (claim.getStatus() != ClaimStatus.SUBMITTED) {
+                    throw new RuntimeException("Only SUBMITTED claims can be picked up for review. Current status: " + claim.getStatus());
+                }
+            }
+            
+            // Update status
             claim.setStatus(statusDTO.getStatus());
+            
+            // Set rejection reason if status is REJECTED
             if (statusDTO.getStatus() == ClaimStatus.REJECTED) {
                 claim.setRejectionReason(statusDTO.getRejectionReason());
             } else {
                 claim.setRejectionReason(null);
+            }
+            
+            // Track Claims Officer for IN_REVIEW, APPROVED, or REJECTED status
+            if (statusDTO.getStatus() == ClaimStatus.IN_REVIEW ||
+                statusDTO.getStatus() == ClaimStatus.APPROVED || 
+                statusDTO.getStatus() == ClaimStatus.REJECTED) {
+                
+                if (token != null && !token.isEmpty()) {
+                    try {
+                        // Extract officer information from JWT token
+                        String officerName = jwtUtil.extractUsername(token);
+                        Integer officerId = jwtUtil.extractUserId(token);
+                        
+                        // Set officer info for all status changes
+                        claim.setProcessedBy(officerName);
+                        claim.setProcessedById(officerId);
+                        claim.setProcessedDate(LocalDateTime.now());
+                    } catch (Exception e) {
+                        // If token extraction fails, log but continue processing
+                        System.err.println("Failed to extract user info from token: " + e.getMessage());
+                    }
+                }
             }
         } else {
             throw new RuntimeException("Invalid status update. Allowed: IN_REVIEW, APPROVED, REJECTED");
@@ -124,12 +165,16 @@ public class ClaimServiceImpl implements ClaimService{
         
         Claim savedClaim = claimRepository.save(claim);
         
-        
+        // Send notification to user
         String subject = "Claim Status Update: " + savedClaim.getStatus();
         String body = "Your claim #" + id + " has been " + savedClaim.getStatus();
         
         if(savedClaim.getStatus() == ClaimStatus.REJECTED) {
             body += ". Reason: " + savedClaim.getRejectionReason();
+        }
+        
+        if (savedClaim.getProcessedBy() != null) {
+            body += " by " + savedClaim.getProcessedBy();
         }
         
         Integer userId = policyClient.getPolicyById(claim.getPolicyId()).getUserId();
@@ -156,8 +201,27 @@ public class ClaimServiceImpl implements ClaimService{
                 .rejectionReason(claim.getRejectionReason())
                 .documentUrl(claim.getDocumentUrl())
                 .date(claim.getDate())
+                .processedBy(claim.getProcessedBy())
+                .processedById(claim.getProcessedById())
+                .processedDate(claim.getProcessedDate())
                 .build();
     }
 
-	
+    @Override
+    public List<ClaimResponse> getInReviewClaimsByOfficer(Integer officerId) {
+        return claimRepository.findByProcessedByIdAndStatus(officerId, ClaimStatus.IN_REVIEW)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ClaimResponse> getProcessedClaimsByOfficer(Integer officerId) {
+        return claimRepository.findByProcessedByIdAndStatusIn(
+                officerId, 
+                Arrays.asList(ClaimStatus.APPROVED, ClaimStatus.REJECTED))
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 }

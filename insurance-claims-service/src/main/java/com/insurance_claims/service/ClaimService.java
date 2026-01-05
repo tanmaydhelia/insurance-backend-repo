@@ -18,5 +18,9 @@ public interface ClaimService {
 	
 	public List<ClaimResponse> getOpenClaims();
 	
-	public ClaimResponse updateClaimStatus(Integer id, ClaimStatusDTO status);
+	public ClaimResponse updateClaimStatus(Integer id, ClaimStatusDTO status, String token);
+	
+	public List<ClaimResponse> getInReviewClaimsByOfficer(Integer officerId);
+	
+	public List<ClaimResponse> getProcessedClaimsByOfficer(Integer officerId);
 }

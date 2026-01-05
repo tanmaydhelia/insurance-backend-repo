@@ -1,6 +1,7 @@
 package com.insurance_claims.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.insurance_claims.model.ClaimStatus;
 import com.insurance_claims.model.SubmissionSource;
@@ -21,4 +22,9 @@ public class ClaimResponse {
     private String rejectionReason;
     private LocalDate date;
     private String documentUrl;
+    
+    // Claims Officer processing information
+    private String processedBy;
+    private Integer processedById;
+    private LocalDateTime processedDate;
 }

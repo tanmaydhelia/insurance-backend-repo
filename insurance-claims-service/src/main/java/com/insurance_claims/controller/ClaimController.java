@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,10 +55,30 @@ public class ClaimController {
     public ResponseEntity<List<ClaimResponse>> getOpenClaims() {
         return ResponseEntity.ok(claimService.getOpenClaims());
     }
+    
+    @GetMapping("/officer/{officerId}/in-review")
+    public ResponseEntity<List<ClaimResponse>> getInReviewClaimsByOfficer(@PathVariable Integer officerId) {
+        return ResponseEntity.ok(claimService.getInReviewClaimsByOfficer(officerId));
+    }
+    
+    @GetMapping("/officer/{officerId}/processed")
+    public ResponseEntity<List<ClaimResponse>> getProcessedClaimsByOfficer(@PathVariable Integer officerId) {
+        return ResponseEntity.ok(claimService.getProcessedClaimsByOfficer(officerId));
+    }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<ClaimResponse> updateStatus(@PathVariable Integer id, @RequestBody ClaimStatusDTO statusDTO) {
-        return ResponseEntity.ok(claimService.updateClaimStatus(id, statusDTO));
+    public ResponseEntity<ClaimResponse> updateStatus(
+            @PathVariable Integer id, 
+            @RequestBody ClaimStatusDTO statusDTO,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        
+        // Extract token from Authorization header
+        String token = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+        
+        return ResponseEntity.ok(claimService.updateClaimStatus(id, statusDTO, token));
     }
     
     @PostMapping("/upload")

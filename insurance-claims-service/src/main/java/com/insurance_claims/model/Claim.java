@@ -1,7 +1,9 @@
 package com.insurance_claims.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -39,4 +41,14 @@ public class Claim {
     private String rejectionReason;
     private LocalDate date;
     private String documentUrl;
+    
+    // Fields to track Claims Officer processing
+    @Column(name = "processed_by")
+    private String processedBy;
+    
+    @Column(name = "processed_by_id")
+    private Integer processedById;
+    
+    @Column(name = "processed_date")
+    private LocalDateTime processedDate;
 }
