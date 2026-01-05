@@ -17,4 +17,5 @@ public class PolicyResponse {
     private Integer userId;
     private Integer agentId;
     private PlanResponse plan;
+    private MemberDocumentResponse memberDocuments;
 }

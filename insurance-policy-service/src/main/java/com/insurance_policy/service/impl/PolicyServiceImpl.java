@@ -9,15 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import com.insurance_policy.InsurancePolicyServiceApplication;
+import com.insurance_policy.dto.MemberDocumentResponse;
 import com.insurance_policy.dto.NotificationEvent;
 import com.insurance_policy.dto.PlanRequest;
 import com.insurance_policy.dto.PlanResponse;
 import com.insurance_policy.dto.PolicyEnrollmentRequest;
 import com.insurance_policy.dto.PolicyResponse;
 import com.insurance_policy.model.InsurancePlan;
+import com.insurance_policy.model.MemberDocument;
 import com.insurance_policy.model.Policy;
 import com.insurance_policy.model.PolicyStatus;
 import com.insurance_policy.repository.InsurancePlanRepository;
+import com.insurance_policy.repository.MemberDocumentRepository;
 import com.insurance_policy.repository.PolicyRepository;
 import com.insurance_policy.service.PolicyService;
 
@@ -29,10 +32,13 @@ public class PolicyServiceImpl implements PolicyService{
 	
 	private final InsurancePlanRepository planRepository;
     private final PolicyRepository policyRepository;
+    private final MemberDocumentRepository memberDocumentRepository;
 
-    public PolicyServiceImpl(InsurancePlanRepository planRepository, PolicyRepository policyRepository, InsurancePolicyServiceApplication insurancePolicyServiceApplication) {
+    public PolicyServiceImpl(InsurancePlanRepository planRepository, PolicyRepository policyRepository, 
+            MemberDocumentRepository memberDocumentRepository, InsurancePolicyServiceApplication insurancePolicyServiceApplication) {
         this.planRepository = planRepository;
         this.policyRepository = policyRepository;
+        this.memberDocumentRepository = memberDocumentRepository;
     }
     
     @Override
@@ -52,6 +58,11 @@ public class PolicyServiceImpl implements PolicyService{
     
     @Override
     public PolicyResponse enrollPolicy(PolicyEnrollmentRequest request) {
+        // Check if member has submitted required documents
+        if (!memberDocumentRepository.existsByUserId(request.getUserId())) {
+            throw new RuntimeException("Member documents (Aadhaar, Photo, Medical Checkup) are required before enrolling in a policy. Please submit documents first.");
+        }
+        
         InsurancePlan plan = planRepository.findById(request.getPlanId())
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
@@ -121,6 +132,31 @@ public class PolicyServiceImpl implements PolicyService{
         PolicyResponse response = new PolicyResponse();
         BeanUtils.copyProperties(policy, response);
         response.setPlan(mapToPlanResponse(policy.getInsurancePlan()));
+        
+        // Include member documents if available
+        memberDocumentRepository.findByUserId(policy.getUserId())
+            .ifPresent(doc -> response.setMemberDocuments(mapToMemberDocumentResponse(doc)));
+        
         return response;
+    }
+    
+    private MemberDocumentResponse mapToMemberDocumentResponse(MemberDocument document) {
+        return MemberDocumentResponse.builder()
+                .id(document.getId())
+                .userId(document.getUserId())
+                .aadhaarNumber(maskAadhaarNumber(document.getAadhaarNumber()))
+                .photoUrl(document.getPhotoUrl())
+                .medicalCheckupDocUrl(document.getMedicalCheckupDocUrl())
+                .createdAt(document.getCreatedAt())
+                .updatedAt(document.getUpdatedAt())
+                .build();
+    }
+    
+    // Mask Aadhaar for security: XXXX-XXXX-1234
+    private String maskAadhaarNumber(String aadhaarNumber) {
+        if (aadhaarNumber == null || aadhaarNumber.length() != 12) {
+            return aadhaarNumber;
+        }
+        return "XXXX-XXXX-" + aadhaarNumber.substring(8);
     }
 }
