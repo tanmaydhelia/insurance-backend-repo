@@ -57,6 +57,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         }
                     }
                     
+                    // Restrict /admin/** endpoints to ROLE_ADMIN only
+                    if (path.startsWith("/admin")) {
+                        if (!"ROLE_ADMIN".equals(role)) {
+                            throw new RuntimeException("Forbidden: Admin access required");
+                        }
+                    }
 //          
                 } catch (Exception e) {
                     throw new RuntimeException("Unauthorized Access");

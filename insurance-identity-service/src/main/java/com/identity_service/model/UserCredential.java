@@ -30,5 +30,6 @@ public class UserCredential {
     
     @Enumerated(EnumType.STRING)
     private ERole role;
- 
+    
+    private Boolean active = true;
 }

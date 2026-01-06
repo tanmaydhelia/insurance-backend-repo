@@ -1,7 +1,10 @@
 package com.identity_service.service.impl;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -13,7 +16,9 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.identity_service.dto.ChangePasswordRequest;
+import com.identity_service.dto.CreateUserRequest;
 import com.identity_service.dto.NotificationEvent;
+import com.identity_service.dto.UserResponse;
 import com.identity_service.model.ERole;
 import com.identity_service.model.UserCredential;
 import com.identity_service.repository.UserCredentialRepository;
@@ -130,5 +135,185 @@ public class AuthServiceImpl implements AuthService{
 	public UserCredential getUserById(Integer id) {
 		return userCredRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+	}
+	
+	// ==================== ADMIN METHODS ====================
+	
+	/**
+	 * Create a new user (Admin only) - for agents, officers, providers
+	 */
+	public UserResponse createUserByAdmin(CreateUserRequest request) {
+	    // Validate role - admins cannot create regular users through this endpoint
+	    if (request.getRole() == ERole.ROLE_USER) {
+	        throw new RuntimeException("Use /auth/register for creating regular users");
+	    }
+	    
+	    // Check if email already exists
+	    if (userCredRepo.existsByEmail(request.getEmail())) {
+	        throw new RuntimeException("Email already registered: " + request.getEmail());
+	    }
+	    
+	    UserCredential user = new UserCredential();
+	    user.setName(request.getName());
+	    user.setEmail(request.getEmail());
+	    user.setPassword(passwordEncoder.encode(request.getPassword()));
+	    user.setRole(request.getRole());
+	    user.setActive(true);
+	    
+	    UserCredential savedUser = userCredRepo.save(user);
+	    
+	    // Send notification
+	    NotificationEvent event = new NotificationEvent(
+	        savedUser.getId(),
+	        "Account Created - Smart Health Insurance",
+	        "Dear " + savedUser.getName() + ", your " + getRoleName(savedUser.getRole()) + 
+	        " account has been created. Please login with your credentials."
+	    );
+	    kafkaTemplate.send("notification_topic", event);
+	    
+	    return mapToUserResponse(savedUser);
+	}
+	
+	/**
+	 * Suspend a user account (Admin only)
+	 */
+	public UserResponse suspendUser(Integer userId) {
+	    UserCredential user = userCredRepo.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+	    
+	    if (user.getRole() == ERole.ROLE_ADMIN) {
+	        throw new RuntimeException("Cannot suspend an admin account");
+	    }
+	    
+	    user.setActive(false);
+	    UserCredential savedUser = userCredRepo.save(user);
+	    
+	    // Send notification
+	    NotificationEvent event = new NotificationEvent(
+	        savedUser.getId(),
+	        "Account Suspended",
+	        "Dear " + savedUser.getName() + ", your account has been suspended. Please contact support for more information."
+	    );
+	    kafkaTemplate.send("notification_topic", event);
+	    
+	    return mapToUserResponse(savedUser);
+	}
+	
+	/**
+	 * Activate a suspended user account (Admin only)
+	 */
+	public UserResponse activateUser(Integer userId) {
+	    UserCredential user = userCredRepo.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+	    
+	    user.setActive(true);
+	    UserCredential savedUser = userCredRepo.save(user);
+	    
+	    // Send notification
+	    NotificationEvent event = new NotificationEvent(
+	        savedUser.getId(),
+	        "Account Reactivated",
+	        "Dear " + savedUser.getName() + ", your account has been reactivated. You can now login."
+	    );
+	    kafkaTemplate.send("notification_topic", event);
+	    
+	    return mapToUserResponse(savedUser);
+	}
+	
+	/**
+	 * Get all users by role (Admin only)
+	 */
+	public List<UserResponse> getUsersByRole(ERole role) {
+	    return userCredRepo.findByRole(role).stream()
+	            .map(this::mapToUserResponse)
+	            .collect(Collectors.toList());
+	}
+	
+	/**
+	 * Get all staff users (agents, officers, providers) - excludes regular users
+	 */
+	public List<UserResponse> getAllStaffUsers() {
+	    List<ERole> staffRoles = Arrays.asList(
+	        ERole.ROLE_AGENT, 
+	        ERole.ROLE_CLAIMS_OFFICER, 
+	        ERole.ROLE_PROVIDER,
+	        ERole.ROLE_ADMIN
+	    );
+	    return userCredRepo.findByRoleIn(staffRoles).stream()
+	            .map(this::mapToUserResponse)
+	            .collect(Collectors.toList());
+	}
+	
+	/**
+	 * Get all users (Admin only)
+	 */
+	public List<UserResponse> getAllUsers() {
+	    return userCredRepo.findAll().stream()
+	            .map(this::mapToUserResponse)
+	            .collect(Collectors.toList());
+	}
+	
+	/**
+	 * Update user details (Admin only)
+	 */
+	public UserResponse updateUser(Integer userId, CreateUserRequest request) {
+	    UserCredential user = userCredRepo.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+	    
+	    // Update fields if provided
+	    if (request.getName() != null && !request.getName().isEmpty()) {
+	        user.setName(request.getName());
+	    }
+	    if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+	        // Check if new email is already taken by another user
+	        if (!user.getEmail().equals(request.getEmail()) && userCredRepo.existsByEmail(request.getEmail())) {
+	            throw new RuntimeException("Email already in use: " + request.getEmail());
+	        }
+	        user.setEmail(request.getEmail());
+	    }
+	    if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+	        user.setPassword(passwordEncoder.encode(request.getPassword()));
+	    }
+	    if (request.getRole() != null) {
+	        user.setRole(request.getRole());
+	    }
+	    
+	    UserCredential savedUser = userCredRepo.save(user);
+	    return mapToUserResponse(savedUser);
+	}
+	
+	/**
+	 * Delete user (Admin only) - use with caution
+	 */
+	public void deleteUser(Integer userId) {
+	    UserCredential user = userCredRepo.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+	    
+	    if (user.getRole() == ERole.ROLE_ADMIN) {
+	        throw new RuntimeException("Cannot delete an admin account");
+	    }
+	    
+	    userCredRepo.delete(user);
+	}
+	
+	// Helper methods
+	private UserResponse mapToUserResponse(UserCredential user) {
+	    return UserResponse.builder()
+	            .id(user.getId())
+	            .name(user.getName())
+	            .email(user.getEmail())
+	            .role(user.getRole())
+	            .active(user.getActive())
+	            .build();
+	}
+	
+	private String getRoleName(ERole role) {
+	    switch (role) {
+	        case ROLE_AGENT: return "Insurance Agent";
+	        case ROLE_CLAIMS_OFFICER: return "Claims Officer";
+	        case ROLE_PROVIDER: return "Healthcare Provider";
+	        case ROLE_ADMIN: return "Administrator";
+	        default: return "User";
+	    }
 	}
 }

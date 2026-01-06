@@ -19,6 +19,13 @@ public class CustomerUserDetailsService implements UserDetailsService{
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<UserCredential> credential = userCredRepo.findByEmail(username);
 		
-		return credential.map(CustomUserDetails::new).orElseThrow(() -> new UsernameNotFoundException("user not found with email: " + username));
+		UserCredential user = credential.orElseThrow(() -> new UsernameNotFoundException("user not found with email: " + username));
+		
+		// Check if user account is active (null is treated as active for backward compatibility)
+		if (user.getActive() != null && !user.getActive()) {
+			throw new UsernameNotFoundException("Account is suspended. Please contact support.");
+		}
+		
+		return new CustomUserDetails(user);
 	}
 }

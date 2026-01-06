@@ -30,7 +30,7 @@ public class AuthConfig {
 		http.csrf(AbstractHttpConfigurer::disable).cors(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/auth/register", "/auth/token", "/auth/validate", "/auth/change-password",
-								"/auth/google", "/auth/users/**", "/auth/user/**")
+								"/auth/google", "/auth/users/**", "/auth/user/**", "/admin/**")
 						.permitAll().anyRequest().authenticated());
 
 		return http.build();
