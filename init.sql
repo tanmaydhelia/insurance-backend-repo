@@ -15,5 +15,3 @@ GRANT ALL PRIVILEGES ON insurance_policy_db.* TO 'root'@'%';
 GRANT ALL PRIVILEGES ON insurance_claim_db.* TO 'root'@'%';
 GRANT ALL PRIVILEGES ON insurance_provider_db.* TO 'root'@'%';
 GRANT ALL PRIVILEGES ON insurance_billing_db.* TO 'root'@'%';
-
-FLUSH PRIVILEGES;

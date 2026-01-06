@@ -24,6 +24,7 @@ import com.identity_service.model.UserCredential;
 import com.identity_service.repository.UserCredentialRepository;
 import com.identity_service.security.JwtService;
 import com.identity_service.service.AuthService;
+import com.identity_service.util.EmailTemplateHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -93,8 +94,8 @@ public class AuthServiceImpl implements AuthService{
     	
     	NotificationEvent event = new NotificationEvent(
                 creds.getId(),
-                "Welcome to Smart Health Insurance",
-                "Dear " + creds.getName() + ", your account has been successfully created."
+                "Welcome to RestO'Sure - Your Health Insurance Partner",
+                EmailTemplateHelper.formatWelcomeEmail(creds.getName())
             );
        	kafkaTemplate.send("notification_topic", event);
     	
@@ -160,18 +161,16 @@ public class AuthServiceImpl implements AuthService{
 	    user.setRole(request.getRole());
 	    user.setActive(true);
 	    
-	    UserCredential savedUser = userCredRepo.save(user);
-	    
-	    // Send notification
-	    NotificationEvent event = new NotificationEvent(
-	        savedUser.getId(),
-	        "Account Created - Smart Health Insurance",
-	        "Dear " + savedUser.getName() + ", your " + getRoleName(savedUser.getRole()) + 
-	        " account has been created. Please login with your credentials."
-	    );
-	    kafkaTemplate.send("notification_topic", event);
-	    
-	    return mapToUserResponse(savedUser);
+    	
+    	UserCredential savedUser = userCredRepo.save(user);
+    	
+    	// Send notification
+    	NotificationEvent event = new NotificationEvent(
+    	    savedUser.getId(),
+    	    "Account Created - RestO'Sure",
+    	    EmailTemplateHelper.formatAccountCreatedEmail(savedUser.getName(), getRoleName(savedUser.getRole()))
+    	);
+    	kafkaTemplate.send("notification_topic", event);	    return mapToUserResponse(savedUser);
 	}
 	
 	/**
@@ -185,18 +184,17 @@ public class AuthServiceImpl implements AuthService{
 	        throw new RuntimeException("Cannot suspend an admin account");
 	    }
 	    
-	    user.setActive(false);
-	    UserCredential savedUser = userCredRepo.save(user);
-	    
-	    // Send notification
-	    NotificationEvent event = new NotificationEvent(
-	        savedUser.getId(),
-	        "Account Suspended",
-	        "Dear " + savedUser.getName() + ", your account has been suspended. Please contact support for more information."
-	    );
-	    kafkaTemplate.send("notification_topic", event);
-	    
-	    return mapToUserResponse(savedUser);
+    	
+    	user.setActive(false);
+    	UserCredential savedUser = userCredRepo.save(user);
+    	
+    	// Send notification
+    	NotificationEvent event = new NotificationEvent(
+    	    savedUser.getId(),
+    	    "Account Suspended - RestO'Sure",
+    	    EmailTemplateHelper.formatAccountSuspendedEmail(savedUser.getName())
+    	);
+    	kafkaTemplate.send("notification_topic", event);	    return mapToUserResponse(savedUser);
 	}
 	
 	/**
@@ -206,18 +204,17 @@ public class AuthServiceImpl implements AuthService{
 	    UserCredential user = userCredRepo.findById(userId)
 	            .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 	    
-	    user.setActive(true);
-	    UserCredential savedUser = userCredRepo.save(user);
-	    
-	    // Send notification
-	    NotificationEvent event = new NotificationEvent(
-	        savedUser.getId(),
-	        "Account Reactivated",
-	        "Dear " + savedUser.getName() + ", your account has been reactivated. You can now login."
-	    );
-	    kafkaTemplate.send("notification_topic", event);
-	    
-	    return mapToUserResponse(savedUser);
+    	
+    	user.setActive(true);
+    	UserCredential savedUser = userCredRepo.save(user);
+    	
+    	// Send notification
+    	NotificationEvent event = new NotificationEvent(
+    	    savedUser.getId(),
+    	    "Account Reactivated - RestO'Sure",
+    	    EmailTemplateHelper.formatAccountReactivatedEmail(savedUser.getName())
+    	);
+    	kafkaTemplate.send("notification_topic", event);	    return mapToUserResponse(savedUser);
 	}
 	
 	/**

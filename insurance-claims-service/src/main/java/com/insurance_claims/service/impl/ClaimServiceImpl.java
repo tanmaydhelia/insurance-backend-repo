@@ -21,6 +21,7 @@ import com.insurance_claims.model.ClaimStatus;
 import com.insurance_claims.model.SubmissionSource;
 import com.insurance_claims.repository.ClaimRepository;
 import com.insurance_claims.service.ClaimService;
+import com.insurance_claims.util.EmailTemplateHelper;
 import com.insurance_claims.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -68,8 +69,8 @@ public class ClaimServiceImpl implements ClaimService{
 
         NotificationEvent event = new NotificationEvent(
             userId,
-            "Claim Submitted Successfully",
-            "Your claim for " + request.getDiagnosis() + " has been received. Claim ID: " + savedClaim.getId()
+            "Claim Submitted - RestO'Sure",
+            EmailTemplateHelper.formatClaimSubmittedEmail(request.getDiagnosis(), savedClaim.getId())
         );
         kafkaTemplate.send("notification_topic", event);
         
@@ -206,31 +207,44 @@ public class ClaimServiceImpl implements ClaimService{
         Claim savedClaim = claimRepository.save(claim);
         
         // Send notification to user
-        String subject = "Claim Status Update: " + savedClaim.getStatus();
-        String body = "Your claim #" + id + " has been " + savedClaim.getStatus();
+        Integer userId = policyClient.getPolicyById(claim.getPolicyId()).getUserId();
+        String subject;
+        String body;
         
         if(savedClaim.getStatus() == ClaimStatus.APPROVED) {
-            body += ". Approved Amount: ₹" + savedClaim.getApprovedAmount();
-            if (!savedClaim.getApprovedAmount().equals(savedClaim.getClaimAmount())) {
-                body += " (Claimed: ₹" + savedClaim.getClaimAmount() + ")";
-            }
+            subject = "Claim Approved - RestO'Sure";
+            body = EmailTemplateHelper.formatClaimApprovedEmail(
+                savedClaim.getId(),
+                savedClaim.getApprovedAmount(),
+                savedClaim.getProcessedBy() != null ? savedClaim.getProcessedBy() : "Claims Team"
+            );
+        } else if(savedClaim.getStatus() == ClaimStatus.REJECTED) {
+            subject = "Claim Decision Update - RestO'Sure";
+            body = EmailTemplateHelper.formatClaimRejectedEmail(
+                savedClaim.getId(),
+                savedClaim.getRejectionReason() != null ? savedClaim.getRejectionReason() : "Please contact support for details",
+                savedClaim.getProcessedBy() != null ? savedClaim.getProcessedBy() : "Claims Team"
+            );
+        } else {
+            // For IN_REVIEW or other statuses, use a simple notification
+            subject = "Claim Status Update - RestO'Sure";
+            body = String.format("""
+                <h2 style="color: #667eea; margin-bottom: 20px;">Claim Status Update</h2>
+                
+                <p>Dear Valued Member,</p>
+                
+                <p>Your claim #%d status has been updated to <strong>%s</strong>.</p>
+                
+                <p>You can track your claim status by logging into your dashboard.</p>
+                
+                <p style="margin-top: 30px;">
+                    <strong>Best regards,</strong><br>
+                    <span style="color: #667eea;">The RestO'Sure Claims Team</span>
+                </p>
+                """, savedClaim.getId(), savedClaim.getStatus());
         }
-        
-        if(savedClaim.getStatus() == ClaimStatus.REJECTED) {
-            body += ". Reason: " + savedClaim.getRejectionReason();
-        }
-        
-        if (savedClaim.getProcessedBy() != null) {
-            body += " by " + savedClaim.getProcessedBy();
-        }
-        
-        Integer userId = policyClient.getPolicyById(claim.getPolicyId()).getUserId();
 
-        NotificationEvent event = new NotificationEvent(
-        	userId,
-            subject,
-            body
-        );
+        NotificationEvent event = new NotificationEvent(userId, subject, body);
         kafkaTemplate.send("notification_topic", event);
         
         return mapToResponse(savedClaim);
