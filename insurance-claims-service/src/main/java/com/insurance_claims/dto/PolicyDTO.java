@@ -7,4 +7,6 @@ public class PolicyDTO {
 	private Integer id;
     private String status;
     private Integer userId;
+    private Double remainingSumInsured;
+    private Double coverageAmount;
 }

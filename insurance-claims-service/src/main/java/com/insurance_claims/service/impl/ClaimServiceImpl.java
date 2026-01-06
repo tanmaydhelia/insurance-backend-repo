@@ -128,6 +128,39 @@ public class ClaimServiceImpl implements ClaimService{
                 }
             }
             
+            // Handle APPROVED status - validate and set approved amount
+            if (statusDTO.getStatus() == ClaimStatus.APPROVED) {
+                if (statusDTO.getApprovedAmount() == null || statusDTO.getApprovedAmount() <= 0) {
+                    throw new RuntimeException("Approved amount is required and must be greater than 0 for APPROVED status.");
+                }
+                
+                if (statusDTO.getApprovedAmount() > claim.getClaimAmount()) {
+                    throw new RuntimeException("Approved amount cannot exceed the claimed amount of " + claim.getClaimAmount());
+                }
+                
+                // Get policy to check remaining sum insured
+                PolicyDTO policy = policyClient.getPolicyById(claim.getPolicyId());
+                
+                if (policy.getRemainingSumInsured() != null && statusDTO.getApprovedAmount() > policy.getRemainingSumInsured()) {
+                    throw new RuntimeException("Approved amount (" + statusDTO.getApprovedAmount() + 
+                        ") exceeds remaining sum insured (" + policy.getRemainingSumInsured() + ")");
+                }
+                
+                claim.setApprovedAmount(statusDTO.getApprovedAmount());
+                
+                // Set approval comments if provided
+                if (statusDTO.getApprovalComments() != null && !statusDTO.getApprovalComments().trim().isEmpty()) {
+                    claim.setApprovalComments(statusDTO.getApprovalComments().trim());
+                }
+                
+                // Deduct the approved amount from policy's remaining sum insured
+                try {
+                    policyClient.deductCoverage(claim.getPolicyId(), statusDTO.getApprovedAmount());
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to deduct coverage from policy: " + e.getMessage());
+                }
+            }
+            
             // Update status
             claim.setStatus(statusDTO.getStatus());
             
@@ -169,6 +202,13 @@ public class ClaimServiceImpl implements ClaimService{
         String subject = "Claim Status Update: " + savedClaim.getStatus();
         String body = "Your claim #" + id + " has been " + savedClaim.getStatus();
         
+        if(savedClaim.getStatus() == ClaimStatus.APPROVED) {
+            body += ". Approved Amount: ₹" + savedClaim.getApprovedAmount();
+            if (!savedClaim.getApprovedAmount().equals(savedClaim.getClaimAmount())) {
+                body += " (Claimed: ₹" + savedClaim.getClaimAmount() + ")";
+            }
+        }
+        
         if(savedClaim.getStatus() == ClaimStatus.REJECTED) {
             body += ". Reason: " + savedClaim.getRejectionReason();
         }
@@ -196,6 +236,8 @@ public class ClaimServiceImpl implements ClaimService{
                 .hospitalId(claim.getHospitalId())
                 .diagnosis(claim.getDiagnosis())
                 .claimAmount(claim.getClaimAmount())
+                .approvedAmount(claim.getApprovedAmount())
+                .approvalComments(claim.getApprovalComments())
                 .status(claim.getStatus())
                 .submissionSource(claim.getSubmissionSource())
                 .rejectionReason(claim.getRejectionReason())

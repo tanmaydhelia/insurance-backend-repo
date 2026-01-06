@@ -32,6 +32,10 @@ public class Policy {
     private LocalDate startDate;
     private LocalDate endDate;
     private Double premium;
+    
+    // Remaining sum insured (coverage left after claims)
+    @Column(name = "remaining_sum_insured")
+    private Double remainingSumInsured;
 
     @Enumerated(EnumType.STRING)
     private PolicyStatus status;

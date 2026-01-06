@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.insurance_claims.dto.PolicyDTO;
 
@@ -16,4 +18,7 @@ public interface PolicyClient {
 
     @GetMapping("/policy/policies/member/{userId}")
     List<PolicyDTO> getPoliciesByMember(@PathVariable Integer userId);
+    
+    @PutMapping("/policy/policies/{id}/deduct-coverage")
+    PolicyDTO deductCoverage(@PathVariable Integer id, @RequestParam Double amount);
 }

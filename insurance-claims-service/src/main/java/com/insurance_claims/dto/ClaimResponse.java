@@ -17,6 +17,8 @@ public class ClaimResponse {
     private Integer hospitalId;
     private String diagnosis;
     private Double claimAmount;
+    private Double approvedAmount;
+    private String approvalComments;
     private ClaimStatus status;
     private SubmissionSource submissionSource;
     private String rejectionReason;

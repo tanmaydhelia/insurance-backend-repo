@@ -8,4 +8,10 @@ import lombok.Data;
 public class ClaimStatusDTO {
 	private ClaimStatus status;
     private String rejectionReason;
+    
+    // Amount approved by claims officer (required when status is APPROVED)
+    private Double approvedAmount;
+    
+    // Optional comments provided by claims officer when approving
+    private String approvalComments;
 }

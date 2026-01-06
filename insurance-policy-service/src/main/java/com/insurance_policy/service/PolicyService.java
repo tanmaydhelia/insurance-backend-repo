@@ -15,4 +15,5 @@ public interface PolicyService {
     List<PolicyResponse> getPoliciesByAgent(Integer agentId);
     Boolean isPolicyActive(Integer policyId);
     PolicyResponse getPolicyById(Integer id);
+    PolicyResponse deductCoverage(Integer policyId, Double amount);
 }

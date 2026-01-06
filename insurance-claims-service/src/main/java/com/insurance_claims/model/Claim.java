@@ -31,6 +31,14 @@ public class Claim {
     private Integer hospitalId;
     private String diagnosis;
     private Double claimAmount;
+    
+    // Amount approved by claims officer (may be less than or equal to claimAmount)
+    @Column(name = "approved_amount")
+    private Double approvedAmount;
+    
+    // Comments provided by claims officer when approving the claim
+    @Column(name = "approval_comments", length = 1000)
+    private String approvalComments;
 
     @Enumerated(EnumType.STRING)
     private ClaimStatus status;

@@ -74,6 +74,8 @@ public class PolicyServiceImpl implements PolicyService{
         policy.setEndDate(LocalDate.now().plusYears(1));
         policy.setStatus(PolicyStatus.ACTIVE);
         policy.setPremium(plan.getBasePremium());
+        // Initialize remaining sum insured with plan's coverage amount
+        policy.setRemainingSumInsured(plan.getCoverageAmount());
 
         Policy savedPolicy = policyRepository.save(policy);
         
@@ -132,12 +134,49 @@ public class PolicyServiceImpl implements PolicyService{
         PolicyResponse response = new PolicyResponse();
         BeanUtils.copyProperties(policy, response);
         response.setPlan(mapToPlanResponse(policy.getInsurancePlan()));
+        response.setCoverageAmount(policy.getInsurancePlan().getCoverageAmount());
         
         // Include member documents if available
         memberDocumentRepository.findByUserId(policy.getUserId())
             .ifPresent(doc -> response.setMemberDocuments(mapToMemberDocumentResponse(doc)));
         
         return response;
+    }
+    
+    @Override
+    public PolicyResponse deductCoverage(Integer policyId, Double amount) {
+        Policy policy = policyRepository.findById(policyId)
+                .orElseThrow(() -> new RuntimeException("Policy not found with id: " + policyId));
+        
+        if (policy.getStatus() != PolicyStatus.ACTIVE) {
+            throw new RuntimeException("Cannot deduct coverage from inactive policy");
+        }
+        
+        Double currentRemaining = policy.getRemainingSumInsured();
+        
+        // If remainingSumInsured is null (for existing policies), initialize with coverage amount
+        if (currentRemaining == null) {
+            currentRemaining = policy.getInsurancePlan().getCoverageAmount();
+        }
+        
+        if (amount > currentRemaining) {
+            throw new RuntimeException("Deduction amount (" + amount + ") exceeds remaining sum insured (" + currentRemaining + ")");
+        }
+        
+        Double newRemaining = currentRemaining - amount;
+        policy.setRemainingSumInsured(newRemaining);
+        
+        Policy savedPolicy = policyRepository.save(policy);
+        
+        // Send notification about coverage deduction
+        NotificationEvent event = new NotificationEvent(
+            policy.getUserId(),
+            "Policy Coverage Update",
+            "₹" + amount + " has been deducted from your policy coverage. Remaining sum insured: ₹" + newRemaining
+        );
+        kafkaTemplate.send("notification_topic", event);
+        
+        return mapToPolicyResponse(savedPolicy);
     }
     
     private MemberDocumentResponse mapToMemberDocumentResponse(MemberDocument document) {

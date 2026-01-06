@@ -13,6 +13,8 @@ public class PolicyResponse {
     private LocalDate startDate;
     private LocalDate endDate;
     private Double premium;
+    private Double remainingSumInsured;
+    private Double coverageAmount;
     private PolicyStatus status;
     private Integer userId;
     private Integer agentId;
