@@ -50,6 +50,11 @@ public class ClaimController {
     public ResponseEntity<List<ClaimResponse>> getProviderClaims(@PathVariable Integer hospitalId) {
         return ResponseEntity.ok(claimService.getClaimsByProvider(hospitalId));
     }
+    
+    @GetMapping("/agent/{agentId}")
+    public ResponseEntity<List<ClaimResponse>> getAgentClaims(@PathVariable Integer agentId) {
+        return ResponseEntity.ok(claimService.getClaimsByAgent(agentId));
+    }
 
     @GetMapping("/open")
     public ResponseEntity<List<ClaimResponse>> getOpenClaims() {

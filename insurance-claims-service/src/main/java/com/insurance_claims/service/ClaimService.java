@@ -23,4 +23,6 @@ public interface ClaimService {
 	public List<ClaimResponse> getInReviewClaimsByOfficer(Integer officerId);
 	
 	public List<ClaimResponse> getProcessedClaimsByOfficer(Integer officerId);
+	
+	public List<ClaimResponse> getClaimsByAgent(Integer agentId);
 }

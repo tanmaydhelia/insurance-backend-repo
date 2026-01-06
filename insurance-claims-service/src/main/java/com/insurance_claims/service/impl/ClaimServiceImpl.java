@@ -266,4 +266,24 @@ public class ClaimServiceImpl implements ClaimService{
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public List<ClaimResponse> getClaimsByAgent(Integer agentId) {
+        // Get all policies sold by this agent
+        List<PolicyDTO> policies = policyClient.getPoliciesByAgent(agentId);
+        
+        if (policies == null || policies.isEmpty()) {
+            return List.of();
+        }
+        
+        // Extract policy IDs
+        List<Integer> policyIds = policies.stream()
+                .map(PolicyDTO::getId)
+                .collect(Collectors.toList());
+        
+        // Get all claims for these policies
+        return claimRepository.findByPolicyIdIn(policyIds).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 }

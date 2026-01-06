@@ -19,6 +19,9 @@ public interface PolicyClient {
     @GetMapping("/policy/policies/member/{userId}")
     List<PolicyDTO> getPoliciesByMember(@PathVariable Integer userId);
     
+    @GetMapping("/policy/policies/agent/{agentId}")
+    List<PolicyDTO> getPoliciesByAgent(@PathVariable Integer agentId);
+    
     @PutMapping("/policy/policies/{id}/deduct-coverage")
     PolicyDTO deductCoverage(@PathVariable Integer id, @RequestParam Double amount);
 }
