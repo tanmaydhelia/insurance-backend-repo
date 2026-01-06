@@ -112,6 +112,13 @@ public class ClaimServiceImpl implements ClaimService{
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ClaimResponse> getAllClaims() {
+        return claimRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     public ClaimResponse updateClaimStatus(Integer id, ClaimStatusDTO statusDTO, String token) {
         Claim claim = claimRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Claim not found"));

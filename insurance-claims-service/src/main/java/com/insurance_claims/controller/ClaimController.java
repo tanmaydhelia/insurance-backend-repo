@@ -61,6 +61,11 @@ public class ClaimController {
         return ResponseEntity.ok(claimService.getOpenClaims());
     }
     
+    @GetMapping
+    public ResponseEntity<List<ClaimResponse>> getAllClaims() {
+        return ResponseEntity.ok(claimService.getAllClaims());
+    }
+    
     @GetMapping("/officer/{officerId}/in-review")
     public ResponseEntity<List<ClaimResponse>> getInReviewClaimsByOfficer(@PathVariable Integer officerId) {
         return ResponseEntity.ok(claimService.getInReviewClaimsByOfficer(officerId));

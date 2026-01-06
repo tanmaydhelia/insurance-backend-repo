@@ -55,6 +55,13 @@ public class PolicyServiceImpl implements PolicyService{
                 .map(this::mapToPlanResponse)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<PolicyResponse> getAllPolicies() {
+        return policyRepository.findAll().stream()
+                .map(this::mapToPolicyResponse)
+                .collect(Collectors.toList());
+    }
     
     @Override
     public PolicyResponse enrollPolicy(PolicyEnrollmentRequest request) {

@@ -18,6 +18,8 @@ public interface ClaimService {
 	
 	public List<ClaimResponse> getOpenClaims();
 	
+	public List<ClaimResponse> getAllClaims();
+	
 	public ClaimResponse updateClaimStatus(Integer id, ClaimStatusDTO status, String token);
 	
 	public List<ClaimResponse> getInReviewClaimsByOfficer(Integer officerId);

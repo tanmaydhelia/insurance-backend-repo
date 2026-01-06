@@ -10,6 +10,7 @@ import com.insurance_policy.dto.PolicyResponse;
 public interface PolicyService {
 	PlanResponse createPlan(PlanRequest request);
     List<PlanResponse> getAllPlans();
+    List<PolicyResponse> getAllPolicies();
     PolicyResponse enrollPolicy(PolicyEnrollmentRequest request);
     List<PolicyResponse> getPoliciesByMember(Integer userId);
     List<PolicyResponse> getPoliciesByAgent(Integer agentId);

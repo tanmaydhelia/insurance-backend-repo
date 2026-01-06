@@ -38,6 +38,11 @@ public class PolicyController {
         return ResponseEntity.ok(policyService.getAllPlans());
     }
 
+    @GetMapping("/policies")
+    public ResponseEntity<List<PolicyResponse>> getAllPolicies() {
+        return ResponseEntity.ok(policyService.getAllPolicies());
+    }
+
     @PostMapping("/policies/enroll")
     public ResponseEntity<PolicyResponse> enrollPolicy(@RequestBody PolicyEnrollmentRequest request) {
         return new ResponseEntity<>(policyService.enrollPolicy(request), HttpStatus.CREATED);
