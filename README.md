@@ -7,27 +7,32 @@ A comprehensive insurance management system built using Spring Boot microservice
 This system follows a microservices architecture pattern with the following components:
 
 ```
-┌─────────────────┐
-│   API Gateway   │ (Port 9000)
-│   (Spring Cloud │
-│    Gateway)     │
-└────────┬────────┘
-         │
-         ├─────────────────────────────────────────────┐
-         │                                             │
-         ▼                                             ▼
-┌────────────────┐                           ┌──────────────────┐
-│ Service Registry│                           │  Identity Service│
-│    (Eureka)     │◄──────────────────────────│   (Auth & JWT)  │
-│  Port: 8761     │                           │   Port: 8085    │
-└────────┬────────┘                           └──────────────────┘
-         │
-         ├──────────────┬──────────────┬──────────────┐
-         ▼              ▼              ▼              ▼
-┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│Policy Service│ │Claims Service│ │Hospital Svc  │ │  MySQL DBs   │
-│  Port: 8095  │ │  Port: 8100  │ │  Port: 8105  │ │   (4 DBs)    │
-└──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
+                          ┌──────────────────────┐
+                          │  Config Server       │ 8888
+                          │ (Spring Cloud Config)│
+                          └──────────┬───────────┘
+                                     │  spring.config.import
+┌─────────────────┐                  │
+│   API Gateway   │ 9000             │
+│ (Spring Cloud   )                  ▼
+│    Gateway)     │        ┌──────────────────┐
+└────────┬────────┘        │ Service Registry │ 8761
+         │                 │     (Eureka)     │
+         │                 └────────┬─────────┘
+         │                          │
+         ├─────────┬─────────┬──────┴──────┬──────────┬──────────┐
+         ▼         ▼         ▼             ▼          ▼          ▼
+┌────────────┐ ┌──────────┐ ┌───────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐
+│ Identity   │ │ Policy   │ │ Claims    │ │ Hospital │ │ Billing  │ │ Notification │
+│ 8085       │ │ 8095     │ │ 8100      │ │ 8105     │ │ 8115     │ │ 8110         │
+└────┬───────┘ └────┬─────┘ └────┬──────┘ └────┬─────┘ └────┬─────┘ └────┬─────────┘
+     │              │            │             │            │             │
+     │              └────────────┼─────────────┘            │             │
+     │                           │                          │             │
+     ▼                           ▼                          ▼             ▼
+ MySQL DBs                 Kafka (9092)               Razorpay API     SMTP (Gmail)
+ (identity, policy,        (notification events)      (billing)        (emails)
+ claims, provider, billing)
 ```
 
 ## 📋 Microservices Overview
@@ -356,6 +361,49 @@ Response:
 
 ---
 
+## 🌩️ Config Server (Spring Cloud Config)
+
+Centralized configuration for all services.
+
+- Service: `insurance-config-server` (port 8888)
+- Modes supported: native (local files) or Git repo-backed
+
+Client usage (in each service):
+```properties
+spring.application.name=INSURANCE-POLICY-SERVICE
+spring.config.import=optional:configserver:http://localhost:8888
+```
+
+Example externalized config `insurance-policy-service.yml` (served by config server):
+```yaml
+server:
+  port: 8095
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/insurance_policy_db?createDatabaseIfNotExist=true
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+kafka:
+  bootstrap-servers: localhost:9092
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+```
+
+Verify:
+```bash
+curl http://localhost:8888/insurance-policy-service/default
+```
+
+---
+
 ## 🛠️ Technology Stack
 
 ### Backend Framework
@@ -542,6 +590,66 @@ mvn clean test
 
 ---
 
+## 📈 Code Quality & Coverage
+
+### JaCoCo (per service)
+Generate coverage reports:
+```bash
+mvn clean test jacoco:report
+# Open target/site/jacoco/index.html
+```
+Enforce 90% line coverage (pom.xml snippet):
+```xml
+<plugin>
+  <groupId>org.jacoco</groupId>
+  <artifactId>jacoco-maven-plugin</artifactId>
+  <version>0.8.11</version>
+  <executions>
+    <execution>
+      <goals><goal>prepare-agent</goal></goals>
+    </execution>
+    <execution>
+      <id>report</id>
+      <phase>test</phase>
+      <goals><goal>report</goal></goals>
+    </execution>
+    <execution>
+      <id>check</id>
+      <goals><goal>check</goal></goals>
+      <configuration>
+        <rules>
+          <rule>
+            <element>BUNDLE</element>
+            <limits>
+              <limit>
+                <counter>LINE</counter>
+                <value>COVEREDRATIO</value>
+                <minimum>0.90</minimum>
+              </limit>
+            </limits>
+          </rule>
+        </rules>
+      </configuration>
+    </execution>
+  </executions>
+</plugin>
+```
+
+### SonarCloud/SonarQube
+Run analysis for a service:
+```bash
+export SONAR_TOKEN=YOUR_TOKEN
+mvn -DskipTests=false verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+  -Dsonar.projectKey=tanmaydhelia_insurance-policy-service \
+  -Dsonar.organization=tanmaydhelia \
+  -Dsonar.login=$SONAR_TOKEN
+```
+Notes:
+- Policy service tests: 100% coverage on service layer; Claims service: >90%.
+- Configure `sonar.organization=tanmaydhelia` in poms as needed.
+
+---
+
 ## 📊 Database Schema
 
 ### Identity Service Database
@@ -602,6 +710,74 @@ The API Gateway uses Spring Cloud Gateway to route requests:
 2. **Load Balancing**: Automatically load balances requests using `lb://` protocol
 3. **Authentication Filter**: Custom filter validates JWT tokens
 4. **Route Validation**: Certain endpoints bypass authentication
+
+---
+
+## 🛡️ Resilience4j (Circuit Breakers, Retry, Bulkhead, TimeLimiter)
+
+Add dependency to services calling others (Feign/RestTemplate):
+```xml
+<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+</dependency>
+<dependency>
+  <groupId>io.github.resilience4j</groupId>
+  <artifactId>resilience4j-timelimiter</artifactId>
+</dependency>
+```
+
+Usage examples (e.g., in Claims service calling Policy service):
+```java
+@CircuitBreaker(name = "policyService", fallbackMethod = "fallbackPoliciesByAgent")
+public List<PolicyDTO> getPoliciesByAgent(Integer agentId) {
+  return policyClient.getPoliciesByAgent(agentId);
+}
+private List<PolicyDTO> fallbackPoliciesByAgent(Integer agentId, Throwable t) {
+  return Collections.emptyList();
+}
+
+@Retry(name = "policyServiceRetry")
+public PolicyDTO getPolicy(Integer id) { return policyClient.getPolicyById(id); }
+
+@TimeLimiter(name = "policyServiceTL")
+public CompletableFuture<PolicyDTO> getPolicyAsync(Integer id) {
+  return CompletableFuture.supplyAsync(() -> policyClient.getPolicyById(id));
+}
+
+@Bulkhead(name = "claimsBH", type = Bulkhead.Type.SEMAPHORE)
+public ClaimResponse submit(ClaimRequest r) { /* ... */ }
+```
+
+Centralized config via Config Server:
+```yaml
+resilience4j:
+  circuitbreaker:
+    instances:
+      policyService:
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 2s
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+  retry:
+    instances:
+      policyServiceRetry:
+        max-attempts: 3
+        wait-duration: 200ms
+  timelimiter:
+    instances:
+      policyServiceTL:
+        timeout-duration: 2s
+  bulkhead:
+    instances:
+      claimsBH:
+        max-concurrent-calls: 50
+        max-wait-duration: 0
+```
 
 ---
 
@@ -671,6 +847,20 @@ For issues, questions, or contributions, please refer to the project repository.
 - Mobile app integration
 - Premium calculation engine
 - Automated claim processing with AI
+
+---
+
+## ✉️ Notifications (HTML Emails)
+
+Notification Service sends branded HTML emails with RestO'Sure header and privacy policy footer.
+Scenarios: Welcome, Account Created, Suspended, Reactivated, Claim Submitted/Approved/Rejected.
+Templates live in `insurance-notification-service` and are consumed via Kafka events.
+
+## 🐳 Docker & Jenkins
+
+- Build all: `./build-all.sh`
+- Compose up: `docker-compose up -d --build`
+- Jenkinsfile builds each service sequentially and deploys via docker-compose.
 
 ---
 

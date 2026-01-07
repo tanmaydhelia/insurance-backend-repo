@@ -1,0 +1,64 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: INSURANCE-API-GATEWAY
+  cloud:
+    gateway:
+      routes:
+        # Identity Service
+        - id: identity-service
+          uri: lb://INSURANCE-IDENTITY-SERVICE
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=0
+        
+        # Policy Service
+        - id: policy-service
+          uri: lb://INSURANCE-POLICY-SERVICE
+          predicates:
+            - Path=/policy/**
+          filters:
+            - AuthenticationFilter
+            - StripPrefix=0
+        
+        # Claims Service
+        - id: claims-service
+          uri: lb://INSURANCE-CLAIMS-SERVICE
+          predicates:
+            - Path=/claims/**
+          filters:
+            - AuthenticationFilter
+            - StripPrefix=0
+        
+        # Hospital Service
+        - id: hospital-service
+          uri: lb://INSURANCE-HOSPITAL-SERVICE
+          predicates:
+            - Path=/hospitals/**
+          filters:
+            - AuthenticationFilter
+            - StripPrefix=0
+        
+        # Billing Service
+        - id: billing-service
+          uri: lb://INSURANCE-BILLING-SERVICE
+          predicates:
+            - Path=/billing/**
+          filters:
+            - AuthenticationFilter
+            - StripPrefix=0
+        
+        # Admin Service
+        - id: admin-service
+          uri: lb://INSURANCE-IDENTITY-SERVICE
+          predicates:
+            - Path=/admin/**
+          filters:
+            - AuthenticationFilter
+            - StripPrefix=0
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970

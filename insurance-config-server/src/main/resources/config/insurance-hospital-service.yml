@@ -1,0 +1,18 @@
+server:
+  port: 8105
+
+spring:
+  application:
+    name: INSURANCE-HOSPITAL-SERVICE
+  datasource:
+    url: jdbc:mysql://localhost:3306/insurance_provider_db?createDatabaseIfNotExist=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
