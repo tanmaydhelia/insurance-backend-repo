@@ -648,6 +648,25 @@ Notes:
 - Policy service tests: 100% coverage on service layer; Claims service: >90%.
 - Configure `sonar.organization=tanmaydhelia` in poms as needed.
 
+#### SonarCloud Dashboards
+- Organization Projects: https://sonarcloud.io/organizations/tanmaydhelia/projects
+
+Policy Service:
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-policy-service&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-policy-service)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-policy-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-policy-service)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-policy-service&metric=bugs)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-policy-service)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-policy-service&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-policy-service)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-policy-service&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-policy-service)
+
+Claims Service:
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-claims-service&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-claims-service)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-claims-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-claims-service)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-claims-service&metric=bugs)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-claims-service)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-claims-service&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-claims-service)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=tanmaydhelia_insurance-claims-service&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=tanmaydhelia_insurance-claims-service)
+
 ---
 
 ## 📊 Database Schema
