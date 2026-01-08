@@ -55,6 +55,15 @@ public class AdminController {
     }
     
     /**
+     * Get user by ID
+     * GET /admin/users/{userId}
+     */
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Integer userId) {
+        return ResponseEntity.ok(authService.getUserResponseById(userId));
+    }
+    
+    /**
      * Get users by role
      * GET /admin/users/role/{role}
      * Valid roles: ROLE_AGENT, ROLE_CLAIMS_OFFICER, ROLE_PROVIDER, ROLE_USER, ROLE_ADMIN

@@ -18,6 +18,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.identity_service.dto.ChangePasswordRequest;
 import com.identity_service.dto.CreateUserRequest;
 import com.identity_service.dto.NotificationEvent;
+import com.identity_service.dto.UserBasicInfo;
 import com.identity_service.dto.UserResponse;
 import com.identity_service.model.ERole;
 import com.identity_service.model.UserCredential;
@@ -136,6 +137,28 @@ public class AuthServiceImpl implements AuthService{
 	public UserCredential getUserById(Integer id) {
 		return userCredRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+	}
+	
+	/**
+	 * Get user by ID as UserResponse (without sensitive data)
+	 */
+	public UserResponse getUserResponseById(Integer id) {
+		UserCredential user = userCredRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+		return mapToUserResponse(user);
+	}
+	
+	/**
+	 * Get basic user info by ID (public - only name and email)
+	 */
+	public UserBasicInfo getUserBasicInfo(Integer id) {
+		UserCredential user = userCredRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+		return UserBasicInfo.builder()
+				.id(user.getId())
+				.name(user.getName())
+				.email(user.getEmail())
+				.build();
 	}
 	
 	// ==================== ADMIN METHODS ====================

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.identity_service.dto.AuthRequest;
 import com.identity_service.dto.ChangePasswordRequest;
+import com.identity_service.dto.UserBasicInfo;
 import com.identity_service.model.UserCredential;
 import com.identity_service.service.impl.AuthServiceImpl;
 
@@ -70,5 +71,14 @@ public class AuthController {
 	@GetMapping("/user/{id}")
     public UserCredential getUserById(@PathVariable Integer id) {
         return authService.getUserById(id);
+    }
+	
+	/**
+	 * Get basic user info by ID (public endpoint - no auth required)
+	 * Returns only name and email - safe for hospital/provider lookup
+	 */
+	@GetMapping("/user/{id}/basic")
+    public UserBasicInfo getUserBasicInfo(@PathVariable Integer id) {
+        return authService.getUserBasicInfo(id);
     }
 }
