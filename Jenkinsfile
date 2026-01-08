@@ -89,16 +89,16 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 echo 'Stopping existing containers...'
-                sh 'docker compose down || true'
+                sh 'docker-compose down || true'
                 
                 echo 'Starting services with Docker Compose...'
-                sh 'docker compose up -d --build'
+                sh 'docker-compose up -d --build'
                 
                 echo 'Waiting for services to start...'
                 sh 'sleep 60'
                 
                 echo 'Checking service status...'
-                sh 'docker compose ps'
+                sh 'docker-compose ps'
             }
         }
         
