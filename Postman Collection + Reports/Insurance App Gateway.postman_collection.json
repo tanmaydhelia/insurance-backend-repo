@@ -1,0 +1,828 @@
+{
+	"info": {
+		"_postman_id": "954da0b9-ae17-4853-85d2-1fc7f96adef9",
+		"name": "Insurance App Gateway",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37522898"
+	},
+	"item": [
+		{
+			"name": "3-Policy Service",
+			"item": [
+				{
+					"name": "Create Plan(ADMIN)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6IlJPTEVfQURNSU4iLCJ1c2VySWQiOjEsImVtYWlsIjoiYWRtaW5Ac21hcnRoZWFsdGguY29tIiwiaWF0IjoxNzY3MzM3MjI0LCJleHAiOjE3Njc0MjM2MjR9.hW4ftuL2YjKV1GP0Ay6YVKU0qyZIzZ93NlhFGPG9EY8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Tanmay ka Shield\",\n  \"description\": \"Comprehensive coverage\",\n  \"basePremium\": 12000.00,\n  \"coverageAmount\": 500000.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8095/policy/plans",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8095",
+							"path": [
+								"policy",
+								"plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View All Plans",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6IlJPTEVfVVNFUiIsInVzZXJJZCI6MywiZW1haWwiOiJqb2huLmRvZUBnbWFpbC5jb20iLCJpYXQiOjE3NjczMzc0NzMsImV4cCI6MTc2NzQyMzg3M30.bWJWelc7vvkl1a52cZxgw8oUZimVknkKF-qd_z4-pEg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    "
+						},
+						"url": {
+							"raw": "http://localhost:9000/policy/plans",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"policy",
+								"plans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enroll in Policy(Via Agent)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": 2,\n    \"userId\": 3,\n    \"agentId\": 4\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8095/policy/policies/enroll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8095",
+							"path": [
+								"policy",
+								"policies",
+								"enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enroll in Policy(Self)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": 1,\n    \"userId\": 5,\n    \"agentId\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8095/policy/policies/enroll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8095",
+							"path": [
+								"policy",
+								"policies",
+								"enroll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Policies(Member)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": 1,\n    \"userId\": 101,\n    \"agentId\": 55\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8095/policy/policies/member/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8095",
+							"path": [
+								"policy",
+								"policies",
+								"member",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Policies(Agent)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": 1,\n    \"userId\": 101,\n    \"agentId\": 55\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8095/policy/policies/agent/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8095",
+							"path": [
+								"policy",
+								"policies",
+								"agent",
+								"4"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4-Claim Service",
+			"item": [
+				{
+					"name": "Submit a Claim(USER)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"policyId\": 3,\n    \"diagnosis\": \"Diarrheoa\",\n    \"claimAmount\": 1000.00,\n    \"submissionSource\": \"MEMBER\",\n    \"documentUrl\":\"https://res.cloudinary.com/dhsarmq6x/image/upload/v1767604862/wghpqezi3ruybfd05xyt.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8100/claims/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit a Claim(PROVIDER)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"policyId\": 4,\n    \"diagnosis\": \"Appendicitis Surgery\",\n    \"claimAmount\": 45000.00,\n    \"hospitalId\": 2,\n    \"submissionSource\": \"PROVIDER\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8100/claims/submit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Claim by Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"policyId\": 1,\n    \"diagnosis\": \"Appendicitis Surgery\",\n    \"claimAmount\": 45000.00,\n    \"hospitalId\": 55,\n    \"submissionSource\": \"PROVIDER\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8100/claims/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Claims by members",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"policyId\": 1,\n    \"diagnosis\": \"Appendicitis Surgery\",\n    \"claimAmount\": 45000.00,\n    \"hospitalId\": 55,\n    \"submissionSource\": \"PROVIDER\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8100/claims/member/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"member",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Claims by Provider",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8100/claims/officer/15/in-review",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"officer",
+								"15",
+								"in-review"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Open Claims(OFFICER)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8100/claims/open",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"open"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Claim",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"APPROVED\",\n    \"rejectionReason\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8100/claims/7/status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"7",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Claim",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"REJECTED\",\n    \"rejectionReason\": \"Policy does not cover cosmetic surgery.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8100/claims/5/status",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"5",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload a file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/tanmayy-2312/Downloads/WhatsApp Image 2025-11-18 at 2.24.04 PM.jpeg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8100/claims/upload",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8100",
+							"path": [
+								"claims",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2-Provider Service",
+			"item": [
+				{
+					"name": "Add Network hospitals",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Max Super Speciality Hospital\",\n    \"address\": \"1, Press Enclave Road, Saket\",\n    \"contactNumber\": \"011-26515050\",\n    \"email\": \"info@maxhealthcare.com\",\n    \"isNetworkHospital\": true \n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8105/hospitals",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8105",
+							"path": [
+								"hospitals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all hospitals",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJhZ2VudElkIjo0LCJyb2xlcyI6IlJPTEVfQUdFTlQiLCJ1c2VySWQiOjQsImVtYWlsIjoiYWdlbnQuc21pdGhAc21hcnRoZWFsdGguY29tIiwic3ViIjoiQWdlbnQgU21pdGgiLCJpYXQiOjE3Njc0NjE0MTIsImV4cCI6MTc2NzU0NzgxMn0.c0V3jxY7mohi0Ta_OPqVFc7X44hSLIg6cTDXUL6UUqY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Grand Oak Hospital\",\n    \"address\": \"45 Green Valley, NY\",\n    \"contactNumber\": \"555-0123\",\n    \"email\": \"contact@grandoak.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:9000/hospitals",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"hospitals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hospital by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Grand Oak Hospital\",\n    \"address\": \"45 Green Valley, NY\",\n    \"contactNumber\": \"555-0123\",\n    \"email\": \"contact@grandoak.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8105/hospitals/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8105",
+							"path": [
+								"hospitals",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "1-Auth Service",
+			"item": [
+				{
+					"name": "Register User(ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@smarthealth.com\",\n  \"password\": \"password123\",\n  \"name\": \"System Admin\",\n  \"role\": \"ROLE_ADMIN\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User(User)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"tanmaydhelia2003@gmail.com\",\n  \"password\": \"2003dhelia\",\n  \"name\": \"Officer Dhelia\",\n  \"role\": \"ROLE_CLAIMS_OFFICER\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User(Agent)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"agent.smith@smarthealth.com\",\n  \"password\": \"password123\",\n  \"name\": \"Agent Smith\",\n  \"role\": \"ROLE_AGENT\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User(Claims Officer)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"officer@test.com\",\n    \"password\": \"pass\",\n    \"name\": \"Officer Judy\",\n    \"role\": \"ROLE_CLAIMS_OFFICER\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User(Provider)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"hospital@fortis.com\",\n    \"password\": \"pass\",\n    \"name\": \"Fortis\",\n    \"role\": \"ROLE_PROVIDER\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"tanmaydhelia03@gmail.com\",\n    \"password\": \"2003dhelia\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/auth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"auth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by email",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:9000/auth/users/tanmaydhelia@gmail.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"auth",
+								"users",
+								"tanmaydhelia@gmail.com"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6-Billing Service",
+			"item": [
+				{
+					"name": "Create Payment Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 5000,\n    \"userId\": 2,\n    \"policyId\": 1001\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8115/billing/create-order",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8115",
+							"path": [
+								"billing",
+								"create-order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Payments",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"razorpay_order_id\": \"order_fake123\",\n    \"razorpay_payment_id\": \"pay_fake123\",\n    \"razorpay_signature\": \"fake_signature\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8115/billing/verify",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8115",
+							"path": [
+								"billing",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
