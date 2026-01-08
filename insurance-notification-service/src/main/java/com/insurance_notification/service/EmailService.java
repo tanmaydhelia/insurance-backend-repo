@@ -14,7 +14,7 @@ public class EmailService {
 	@Autowired
     private JavaMailSender javaMailSender;
 
-    private String fromEmail = "tanmaydhelia.labs@gmail.com";
+    private String fromEmail = "noreply.restosure@gmail.com";
 
     public void sendEmail(String to, String subject, String body) {
         try {

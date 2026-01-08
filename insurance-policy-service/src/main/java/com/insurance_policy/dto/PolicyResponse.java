@@ -1,6 +1,7 @@
 package com.insurance_policy.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.insurance_policy.model.PolicyStatus;
 
@@ -20,4 +21,10 @@ public class PolicyResponse {
     private Integer agentId;
     private PlanResponse plan;
     private MemberDocumentResponse memberDocuments;
+    
+    // Renewal information
+    private Long daysRemaining;
+    private Boolean renewable;
+    private LocalDateTime renewalRequestedAt;
+    private String lastRenewalStatus;
 }

@@ -1,6 +1,7 @@
 package com.insurance_policy.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -46,6 +47,16 @@ public class Policy {
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)
     private InsurancePlan insurancePlan;
+    
+    // Renewal tracking fields
+    @Column(name = "renewal_requested_at")
+    private LocalDateTime renewalRequestedAt;
+    
+    @Column(name = "last_renewal_attempt_at")
+    private LocalDateTime lastRenewalAttemptAt;
+    
+    @Column(name = "last_renewal_status")
+    private String lastRenewalStatus; // PENDING, SUCCESS, FAILED
     
     @PrePersist
     public void generatePolicyNumber() {
