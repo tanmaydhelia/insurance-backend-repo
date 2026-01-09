@@ -17,6 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # List of all services
 SERVICES=(
     "insurance-service-registry"
+    "insurance-config-server"
     "insurance-identity-service"
     "insurance-policy-service"
     "insurance-claims-service"

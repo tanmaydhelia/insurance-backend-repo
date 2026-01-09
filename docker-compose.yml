@@ -23,6 +23,25 @@ services:
       retries: 5
 
   # =====================================================
+  # 9. Conig Server
+  # =====================================================
+  config-server:
+    build: ./insurance-config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_APPLICATION_JSON={"eureka":{"client":{"service-url":{"defaultZone":"http://service-registry:8761/eureka/"}}}}
+    depends_on:
+      - service-registry
+      - kafka
+    networks:
+      - insurance-network
+    entrypoint: ["sh", "-c", "sleep 50 && java -jar app.jar"]
+
+  # =====================================================
   # 2. MESSAGE QUEUE - Apache Kafka (KRaft mode)
   # =====================================================
   kafka:

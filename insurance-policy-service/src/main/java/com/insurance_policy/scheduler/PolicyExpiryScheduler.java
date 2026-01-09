@@ -15,12 +15,6 @@ import com.insurance_policy.model.Policy;
 import com.insurance_policy.model.PolicyStatus;
 import com.insurance_policy.repository.PolicyRepository;
 
-/**
- * Scheduler to handle policy expiry and auto-renewal reminders.
- * Runs daily at midnight to:
- * 1. Mark expired policies as EXPIRED
- * 2. Send automated reminders for policies expiring soon
- */
 @Component
 public class PolicyExpiryScheduler {
 
@@ -35,9 +29,7 @@ public class PolicyExpiryScheduler {
         this.policyRepository = policyRepository;
     }
 
-    /**
-     * Runs daily at midnight to mark expired policies
-     */
+    //daily at midnight
     @Scheduled(cron = "0 0 0 * * ?")
     public void markExpiredPolicies() {
         logger.info("Running scheduled task: Mark expired policies");
@@ -49,7 +41,7 @@ public class PolicyExpiryScheduler {
             policy.setStatus(PolicyStatus.EXPIRED);
             policyRepository.save(policy);
             
-            // Send expiry notification
+
             String message = buildExpiryNotificationEmail(policy);
             NotificationEvent event = new NotificationEvent(
                 policy.getUserId(),
@@ -64,9 +56,7 @@ public class PolicyExpiryScheduler {
         logger.info("Completed marking {} policies as expired", expiredPolicies.size());
     }
 
-    /**
-     * Runs daily at 9 AM to send reminders for policies expiring in 30, 15, 7, and 1 day(s)
-     */
+    //Daily at 9 AM
     @Scheduled(cron = "0 0 9 * * ?")
     public void sendExpiryReminders() {
         logger.info("Running scheduled task: Send expiry reminders");
